@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const { User } = require("../../models/user");
 
 const createError = require("../../helpers/createError");
@@ -9,13 +11,14 @@ const register = async (req, res) => {
     throw createError(409, "Email in use");
   }
 
-  const result = await User.create({ email, password });
+  const hashPassword = await bcrypt.hash(password, 10);
+  const result = await User.create({ email, password: hashPassword });
   res.status(201).json({
     user: {
       email: result.email,
-      password: result.password,
+      subscription: result.subscription,
     },
   });
 };
 
-module.exports = { register };
+module.exports = register;
